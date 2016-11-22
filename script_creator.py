@@ -23,7 +23,7 @@ def create_scripts(path_to_info_json):
         execute_file.write('COMMAND="%s"\n' % python_string.rstrip())
         for argument in list(filter(lambda d: d['type'] == 'execute' and d['required'] == False, data['arguments'])):
             execute_file.write('if [ ! -z ${%s} ] && [ ${%s} != "None" ]; then\n' % (argument['position'], argument['position']))
-            execute_file.write('COMMAND="$COMMAND --%s ${%s}"\n' % (argument['name'], argument['position']))
+            execute_file.write('COMMAND="$COMMAND --%s ${%s}"\n' % (argument['name'].replace('_', '-'), argument['position']))
             execute_file.write('fi\n')
             execute_file.write('\n')
 
