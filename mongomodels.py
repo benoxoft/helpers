@@ -114,12 +114,12 @@ class Tag(Document):
         'indexes': [
             'projectId',
         ],
-        'shard_key': ('projectId', 'name'),
+        'shard_key': ('name', 'projectId'),
     }
     
      #PK: project, name
-    projectId = ObjectIdField(required=True,unique_with=['name'])
-    name = StringField(max_length=150, required=True)
+    projectId = ObjectIdField(required=True)
+    name = StringField(max_length=150, required=True, unique_with=['projectId'])
     message = StringField()
     taggerId = ObjectIdField()
     date = DateTimeField()
@@ -195,12 +195,12 @@ class Commit(Document):
         'indexes': [
             'projectId',
         ],
-        'shard_key': ('projectId', 'revisionHash'),
+        'shard_key': ('revisionHash', 'projectId'),
     }
 
     #PK: projectId and revisionhash
-    projectId = ObjectIdField(required=True, unique_with=['revisionHash'] )
-    revisionHash = StringField(max_length=50, required=True)
+    projectId = ObjectIdField(required=True)
+    revisionHash = StringField(max_length=50, required=True, unique_with=['projectId'])
     branches = ListField(StringField(max_length=500))
     tagIds = ListField(ObjectIdField())
     parents = ListField(StringField(max_length=50))
@@ -238,12 +238,12 @@ class TestState(Document):
         'indexes': [
             'commit_id',
         ],
-        'shard_key': ('file_id', 'commit_id', 'long_name'),
+        'shard_key': ('long_name', 'commit_id', 'file_id'),
     }
 
-    file_id = ObjectIdField(required=True,unique_with=['commit_id', 'long_name'])
+    file_id = ObjectIdField(required=True)
     commit_id = ObjectIdField(required=True)
-    long_name = StringField(required=True)
+    long_name = StringField(required=True, unique_with=['commit_id', 'file_id'])
     file_type = StringField()
     depends_on = ListField(ObjectIdField())
     direct_imp = ListField(ObjectIdField())
@@ -410,7 +410,7 @@ class Import(Document):
 
     # PK: commitId and fileId
     commitId = ObjectIdField(required=True, unique_with=['fileId'])
-    fileId = ObjectIdField(required=True, unique_with=['commitId'])
+    fileId = ObjectIdField(required=True)
     imports = ListField(StringField(max_length=300))
 
 
@@ -433,7 +433,7 @@ class NodeTypeCount(Document):
 
     # PK: commitId and fileId
     commitId = ObjectIdField(required=True, unique_with=['fileId'])
-    fileId = ObjectIdField(required=True, unique_with=['commitId'])
+    fileId = ObjectIdField(required=True)
     nodeCount = IntField()  # full number of nodes
     nodeTypeCounts = DictField() # every node with its number for this file
 
@@ -457,14 +457,14 @@ class FileState(Document):
             'commit_id',
             'file_id',
         ],
-        'shard_key': ('commit_id', 'file_id', 'long_name'),
+        'shard_key': ('long_name', 'commit_id', 'file_id'),
     }
 
     file_id = ObjectIdField(required=True)
-    commit_id = ObjectIdField(required=True, unique_with=['file_id', 'long_name'])
+    commit_id = ObjectIdField(required=True)
     parent = ObjectIdField()
     component_ids = ListField(ObjectIdField())
-    long_name = StringField(required=True)
+    long_name = StringField(required=True, unique_with=['commit_id', 'file_id'])
     name = StringField()
     file_type = StringField()
     startLine = IntField()
@@ -492,13 +492,13 @@ class MetaPackageState(Document):
         'indexes': [
             'commit_id'
         ],
-        'shard_key': ('commit_id', 'long_name'),
+        'shard_key': ('long_name', 'commit_id'),
     }
 
-    commit_id = ObjectIdField(required=True, unique_with=['long_name'])
+    commit_id = ObjectIdField(required=True)
     parent_state = ObjectIdField()
     component_ids = ListField(ObjectIdField())
-    long_name = StringField(require=True)
+    long_name = StringField(require=True, unique_with=['commit_id'])
     name = StringField()
     file_type = StringField()
     metrics = DictField()
@@ -525,12 +525,12 @@ class CloneInstance(Document):
             'commit_id',
             'fileId',
         ],
-        'shard_key': ('commit_id', 'fileId', 'name'),
+        'shard_key': ('name', 'commit_id', 'fileId'),
     }
 
-    commit_id = ObjectIdField(required=True, unique_with=['fileId', 'name'])
+    commit_id = ObjectIdField(required=True)
     fileId = ObjectIdField(required=True)
-    name = StringField(required=True)
+    name = StringField(required=True, unique_with=['commit_id', 'fileId'])
     startLine = IntField(required=True)
     endLine = IntField(required=True)
     startColumn = IntField(required=True)
