@@ -167,9 +167,41 @@ class Project(Document):
     name = StringField(max_length=100, required=True)
     repositoryType = StringField(max_length=15)
     issue_urls = ListField(StringField())
-    mailing_urls = ListField(StringField())
+    mailing_list_ids = ListField(ObjectIdField())
     
-        
+
+class MailingList(Document):
+    meta = {
+        'indexes': [
+            '#name'
+        ],
+        'shard_key': ('name', ),
+    }
+
+    name = StringField(required=True)
+    last_updated = DateTimeField(required=True)
+
+
+class Message(Document):
+    meta = {
+        'indexes': [
+            'message_id'
+        ],
+        'shard_key': ('message_id', 'mailing_list_id'),
+    }
+
+    message_id = StringField(required=True, unique_with=['mailing_list_id'])
+    mailing_list_id = ObjectIdField(required=True)
+    reference_ids = ListField(ObjectIdField())
+    in_reply_to_id = ObjectIdField()
+    from_id = ObjectIdField()
+    to_ids = ListField(ObjectIdField())
+    cc_ids = ListField(ObjectIdField())
+    subject = StringField()
+    body = StringField()
+    date = DateTimeField()
+    patches = ListField(StringField())
+
 
 class Commit(Document):
     """ Document that inherits from :class:`mongoengine.Document`. Holds information for the commit collection.
