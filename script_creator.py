@@ -4,10 +4,11 @@ import json
 
 
 def create_scripts(path_to_info_json):
-    print(path_to_info_json)
+    # Load info json
     with open(path_to_info_json, 'r') as info_json:
         data = json.load(info_json)
 
+    # Generate execute.sh
     plugin_path_index = next(index for (index, d) in enumerate(data['arguments']) if d['name'] == 'plugin_path' and d['type'] == 'execute')
     plugin_path_argument = data['arguments'][plugin_path_index]
     python_string = 'python3.5 ${%s}/main.py ' % plugin_path_argument['position']
@@ -28,7 +29,7 @@ def create_scripts(path_to_info_json):
 
         execute_file.write('$COMMAND')
 
-    # Install script
+    # Generate install.sh
     plugin_path_index = next(index for (index, d) in enumerate(data['arguments']) if d['name'] == 'plugin_path' and d['type'] == 'install')
     plugin_path_argument = data['arguments'][plugin_path_index]
     python_string = 'python3.5 ${%s}/setup.py install --user' % plugin_path_argument['position']
