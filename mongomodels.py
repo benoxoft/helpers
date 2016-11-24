@@ -28,17 +28,17 @@ class FileAction(Document):
     """
     meta = {
         'indexes': [
+            '#id',
             'projectId',
-            ('projectId', 'revisionHash'),
+            ('projectId', 'commit_id'),
         ],
-        'shard_key': ('revisionHash', 'projectId', 'fileId'),
+        'shard_key': ('id',),
     }
 
     MODES = ('A', 'M', 'D', 'C', 'T')
     #pk fileId, revisionhash, projectId
-    projectId = ObjectIdField(required=True)
     fileId = ObjectIdField(required=True)
-    revisionHash = StringField(max_length=50, required=True,unique_with=['projectId', 'fileId'])
+    commit_id = ObjectIdField(required=True)
     mode = StringField(max_length=1, required=True, choices=MODES)
     sizeAtCommit = IntField()
     linesAdded = IntField()
@@ -48,9 +48,6 @@ class FileAction(Document):
     # oldFilePathId is only set, if we detected a copy or move operation
     oldFilePathId = ObjectIdField()
     hunkIds = ListField(ObjectIdField())
-    
-        
-    
 
 
 class Hunk(Document):
@@ -166,8 +163,6 @@ class Project(Document):
     url = StringField(max_length=400, required=True, unique=True)
     name = StringField(max_length=100, required=True)
     repositoryType = StringField(max_length=15)
-    issue_urls = ListField(StringField())
-    mailing_list_ids = ListField(ObjectIdField())
     
 
 class MailingList(Document):
@@ -178,6 +173,7 @@ class MailingList(Document):
         'shard_key': ('name', ),
     }
 
+    project_id = ObjectIdField(required=True)
     name = StringField(required=True)
     last_updated = DateTimeField(required=True)
 
@@ -243,7 +239,6 @@ class Commit(Document):
     committerDate = DateTimeField()
     committerOffset = IntField()
     message = StringField()
-    fileActionIds = ListField(ObjectIdField())
 
     
     def __str__(self):
@@ -285,17 +280,30 @@ class TestState(Document):
     error = BooleanField()
 
 
+class IssueSystem(Document):
+    meta = {
+        'indexes': [
+            '#name'
+        ],
+        'shard_key': ('name', ),
+    }
+
+    project_id = ObjectIdField(required=True)
+    url = StringField(required=True)
+    last_updated = DateTimeField(required=True)
+
+
 class Issue(Document):
     meta = {
         'indexes': [
             'system_id',
-            'project_id'
+            'issue_system_id'
         ],
-        'shard_key': ('system_id', 'project_id'),
+        'shard_key': ('system_id', 'issue_system_id'),
     }
 
-    system_id = StringField(unique_with=['project_id'])
-    project_id = ObjectIdField()
+    system_id = StringField(unique_with=['issue_system_id'])
+    issue_system_id = ObjectIdField(required=True)
     title = StringField()
     desc = StringField()
     created_at = DateTimeField()
