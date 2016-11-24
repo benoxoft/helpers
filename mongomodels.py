@@ -290,7 +290,7 @@ class IssueSystem(Document):
 
     project_id = ObjectIdField(required=True)
     url = StringField(required=True)
-    last_updated = DateTimeField(required=True)
+    last_updated = DateTimeField()
 
 
 class Issue(Document):
