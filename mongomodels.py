@@ -29,8 +29,8 @@ class FileAction(Document):
     meta = {
         'indexes': [
             '#id',
-            'projectId',
-            ('projectId', 'commit_id'),
+            'commit_id',
+            ('commit_id', 'fileId'),
         ],
         'shard_key': ('id',),
     }
@@ -283,9 +283,9 @@ class TestState(Document):
 class IssueSystem(Document):
     meta = {
         'indexes': [
-            '#name'
+            '#url'
         ],
-        'shard_key': ('name', ),
+        'shard_key': ('url', ),
     }
 
     project_id = ObjectIdField(required=True)
