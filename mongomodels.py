@@ -5,25 +5,25 @@ from mongoengine import Document, StringField, ListField, DateTimeField, IntFiel
 class FileAction(Document):
     """ Document that inherits from :class:`mongoengine.Document`. Holds information for the fileaction collection.
 
-    
+
     :property projectId: id of the project, which belongs to the file action (type: :class:`mongoengine.fields.ObjectIdField`)
     :property fileId: id of the file, which belongs to the file action (type: :class:`mongoengine.fields.ObjectIdField`)
     :property revisionHash: hash of the revision (type: :class:`mongoengine.fields.StringField`)
     :property mode: mode of the file action (type: :class:`mongoengine.fields.StringField`)
-    
+
         .. NOTE:: It can only be ("A")dded, ("D")eleted, ("M")odified, ("C")opied or Moved, "T" for links (special in git)
-        
+
     :property sizeAtCommit: size of the file on commit (type: :class:`mongoengine.fields.IntField`)
     :property linesAdded: number of lines added in this action (type: :class:`mongoengine.fields.IntField`)
     :property linesDeleted: number of lines deleted in this action (type: :class:`mongoengine.fields.IntField`)
     :property isBinary: indicates if the file is a binary file or not (type: :class:`mongoengine.fields.BooleanField`)
     :property oldFilePathId: object id of old file (if it was moved or copied) (type: :class:`mongoengine.fields.ObjectIdField`)
     :property hunkIds: list of ids to the different hunks of this action (type: :class:`mongoengine.fields.ListField(:class:`mongoengine.fields.ObjectIdField`)`)
-        
+
     .. NOTE:: Unique (or primary key) are the fields: projectId, fileId, and revisionHash.
-    
+
     .. NOTE:: oldFilePathId only exists, if the file was created due to a copy or move action
-    
+
 
     """
     meta = {
@@ -76,11 +76,11 @@ class Hunk(Document):
 
 class File(Document):
     """ Document that inherits from :class:`mongoengine.Document`. Holds information for the file collection.
-    
+
     :property projectId: id of the project, which belongs to the file action (type: :class:`mongoengine.fields.ObjectIdField`)
     :property path: path of the file (type: :class:`mongoengine.fields.StringField`)
     :property name: name of the file (type: :class:`mongoengine.fields.StringField`)
-    
+
     .. NOTE:: Unique (or primary key) are the fields: path, name, and projectId.
     """
     meta = {
@@ -95,16 +95,17 @@ class File(Document):
     path = StringField(max_length=300, required=True,unique_with=['projectId'] )
     name = StringField(max_length=100, required=True)
 
+
 class Tag(Document):
     """ Document that inherits from :class:`mongoengine.Document`. Holds information for the tag collection.
-    
+
     :property projectId: id of the project, which belongs to the file action (type: :class:`mongoengine.fields.ObjectIdField`)
     :property name: name of the tag (type: :class:`mongoengine.fields.StringField`)
     :property message: message of the tag (type: :class:`mongoengine.fields.StringField`)
     :property taggerId: id of the person who created the tag (type: :class:`mongoengine.fields.ObjectIdField`)
     :property date: date of the creation of the tag (type: :class:`mongoengine.fields.DateTimeField`)
     :property offset: offset of the tag creation date for timezones (type: :class:`mongoengine.fields.IntField`)
-    
+
     .. NOTE:: Unique (or primary key) are the fields: name and projectId.
     """
     meta = {
@@ -113,7 +114,7 @@ class Tag(Document):
         ],
         'shard_key': ('name', 'projectId'),
     }
-    
+
      #PK: project, name
     projectId = ObjectIdField(required=True)
     name = StringField(max_length=150, required=True, unique_with=['projectId'])
@@ -121,19 +122,19 @@ class Tag(Document):
     taggerId = ObjectIdField()
     date = DateTimeField()
     offset = IntField()
-    
+
 class People(Document):
     """ Document that inherits from :class:`mongoengine.Document`. Holds information for the people collection.
-    
+
     :property name: name of the person (type: :class:`mongoengine.fields.StringField`)
     :property email: email of the person (type: :class:`mongoengine.fields.StringField`)
-    
+
     .. NOTE:: Unique (or primary key) are the fields: name and email.
     """
     meta = {
         'shard_key': ('email', 'name',)
     }
-    
+
      #PK: email, name
     email = StringField(max_length=150, required=True, unique_with=['name'])
     name = StringField(max_length=150, required=True)
@@ -141,15 +142,15 @@ class People(Document):
 
     def __hash__(self):
         return hash(self.name+self.email)
-    
-    
+
+
 class Project(Document):
     """ Document that inherits from :class:`mongoengine.Document`. Holds information for the project collection.
-    
+
     :property url: url to the project repository (type: :class:`mongoengine.fields.StringField`)
     :property name: name of the project (type: :class:`mongoengine.fields.StringField`)
     :property repositoryType: type of the repository (type: :class:`mongoengine.fields.StringField`)
-    
+
     .. NOTE:: Unique (or primary key) is the field url.
     """
     meta = {
@@ -163,7 +164,7 @@ class Project(Document):
     url = StringField(max_length=400, required=True, unique=True)
     name = StringField(max_length=100, required=True)
     repositoryType = StringField(max_length=15)
-    
+
 
 class MailingList(Document):
     meta = {
@@ -201,7 +202,7 @@ class Message(Document):
 
 class Commit(Document):
     """ Document that inherits from :class:`mongoengine.Document`. Holds information for the commit collection.
-    
+
     :property projectId: id of the project, which belongs to the file action (type: :class:`mongoengine.fields.ObjectIdField`)
     :property revisionHash: revision hash of the commit (type: :class:`mongoengine.fields.StringField`)
     :property branches: list of branches to which the commit belongs to (type: :class:`mongoengine.fields.ListField(:class:`mongoengine.fields.StringField`)`)
@@ -215,7 +216,7 @@ class Commit(Document):
     :property committerOffset: offset of the committerDate (type: :class:`mongoengine.fields.IntField`)
     :property message: commit message (type: :class:`mongoengine.fields.StringField`)
     :property fileActionIds: list of file action ids, which belong to the commit (type: :class:`mongoengine.fields.ListField(:class:`mongoengine.fields.ObjectIdField`)`)
-    
+
     .. NOTE:: Unique (or primary key) are the fields projectId and revisionHash.
     """
 
@@ -240,7 +241,7 @@ class Commit(Document):
     committerOffset = IntField()
     message = StringField()
 
-    
+
     def __str__(self):
         return ""
 
